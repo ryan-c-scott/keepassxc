@@ -150,6 +150,7 @@ set(keepassx_FORMS
 
 add_feature_info(KeePassHTTP WITH_XC_HTTP "KeePassHTTP support for ChromeIPass and PassIFox")
 add_feature_info(Autotype WITH_XC_AUTOTYPE "Auto-type passwords in Input fields")
+add_feature_info(SshKeys WITH_XC_SSHKEYS "SSH key automatic agent interaction")
 
 add_subdirectory(http)
 if(WITH_XC_HTTP)
@@ -170,6 +171,11 @@ set(autotype_SOURCES
     autotype/WindowSelectComboBox.cpp
     autotype/test/AutoTypeTestInterface.h
 )
+
+add_subdirectory(ssh)
+if(WITH_XC_SSHKEYS)
+    set(sshkeys_LIB sshkeys)
+endif()
 
 if(MINGW)
   set(keepassx_SOURCES_MAINEXE
@@ -193,6 +199,7 @@ set_target_properties(keepassx_core PROPERTIES COMPILE_DEFINITIONS KEEPASSX_BUIL
 target_link_libraries(keepassx_core
                       ${keepasshttp_LIB}
                       ${autotype_LIB}
+                      ${sshkeys_LIB}
                       zxcvbn
                       qhttp
                       Qt5::Core

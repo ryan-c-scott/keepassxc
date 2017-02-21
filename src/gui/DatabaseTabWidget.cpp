@@ -15,6 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config-keepassx.h"
+
 #include "DatabaseTabWidget.h"
 
 #include <QFileInfo>
@@ -38,6 +40,10 @@
 #include "gui/entry/EntryView.h"
 #include "gui/group/GroupView.h"
 #include "gui/UnlockDatabaseDialog.h"
+
+#ifdef WITH_XC_SSHKEYS
+#include "ssh/SshKeys.h"
+#endif
 
 DatabaseManagerStruct::DatabaseManagerStruct()
     : dbWidget(nullptr)
@@ -63,6 +69,10 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     connect(this, SIGNAL(currentChanged(int)), SLOT(emitActivateDatabaseChanged()));
     connect(this, SIGNAL(activateDatabaseChanged(DatabaseWidget*)), m_dbWidgetSateSync, SLOT(setActive(DatabaseWidget*)));
     connect(autoType(), SIGNAL(globalShortcutTriggered()), SLOT(performGlobalAutoType()));
+
+#ifdef WITH_XC_SSHKEYS
+    new SshKeys(this);
+#endif
 }
 
 DatabaseTabWidget::~DatabaseTabWidget()
