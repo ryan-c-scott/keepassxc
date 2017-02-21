@@ -250,6 +250,13 @@ if(APPLE)
                      COMMAND ${QT_BINARY_DIR}/macdeployqt ${PROGNAME}.app
                      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src
                      COMMENT "Deploying app bundle")
+  if(WITH_XC_SSHKEYS)
+    add_custom_command(TARGET ${PROGNAME}
+                       POST_BUILD
+                       COMMAND cp ssh-ask-pipe src/${PROGNAME}.app/Contents/MacOS
+                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                       COMMENT "Copying ssh-ask-pipe helper to app bundle")
+  endif()
 endif()
 
 if(MINGW)
