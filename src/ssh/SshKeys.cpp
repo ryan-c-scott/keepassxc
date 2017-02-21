@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2017 Ryan C. Scott <ryan@5pmCasual.com>
+ */
+
 #include <QApplication>
 #include <QDebug>
 #include <QUrl>
