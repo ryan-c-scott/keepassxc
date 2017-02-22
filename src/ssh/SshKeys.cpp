@@ -49,7 +49,7 @@ void SshKeys::addKey(Entry *entry, QString hostname, QProcessEnvironment &env)
 {
     auto url = QUrl(entry->url());
     
-    if (url.scheme() == "ssh" && QString::compare(hostname, url.host(), Qt::CaseInsensitive) == 0) {
+    if (url.scheme() == "ssh") { // && QString::compare(hostname, url.host(), Qt::CaseInsensitive) == 0) {
         qDebug() << "SSH: Adding key:" << url.path();
 
         QProcess add;
