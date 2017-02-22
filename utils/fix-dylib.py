@@ -1,8 +1,9 @@
+#!/usr/bin/env python
+
 #
 # Copyright (C) 2017 Ryan C. Scott <ryan@5pmCasual.com>
 #
 
-#!/usr/bin/env python
 
 import os
 import sys
