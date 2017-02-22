@@ -235,6 +235,10 @@ target_link_libraries(${PROGNAME} keepassx_core)
 
 set_target_properties(${PROGNAME} PROPERTIES ENABLE_EXPORTS ON)
 
+if(WITH_XC_SSHKEYS)
+  add_executable(ssh-ask-pipe WIN32 ssh/ssh-ask-pipe.c)
+endif()
+
 if(APPLE)
   configure_file(${CMAKE_SOURCE_DIR}/share/macosx/Info.plist.cmake ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
   set_target_properties(${PROGNAME} PROPERTIES
@@ -268,7 +272,6 @@ if(APPLE)
                      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src
                      COMMENT "Deploying app bundle")
   if(WITH_XC_SSHKEYS)
-    add_executable(ssh-ask-pipe WIN32 ssh/ssh-ask-pipe.c)
     add_custom_command(TARGET ${PROGNAME}
                        POST_BUILD
                        DEPENDS ssh-ask-pipe
