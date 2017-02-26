@@ -26,6 +26,7 @@ class SshKeys : public QObject
 private Q_SLOTS:
     void onUnlock(DatabaseWidget *dbWidget);
     void onLock(DatabaseWidget *dbWidget);
+    void onClose(QString path);
     
 public:
     explicit SshKeys(DatabaseTabWidget *parent = 0);

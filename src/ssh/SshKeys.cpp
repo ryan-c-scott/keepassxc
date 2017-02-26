@@ -23,6 +23,9 @@ SshKeys::SshKeys(DatabaseTabWidget *parent) : QObject(parent)
 
     connect(parent, SIGNAL(databaseLocked(DatabaseWidget*)),
             this, SLOT(onLock(DatabaseWidget*)));
+
+    connect(parent, SIGNAL(databaseWithFileClosed(QString)),
+            this, SLOT(onClose(QString)));
 }
 
 SshKeys::~SshKeys()
@@ -31,7 +34,7 @@ SshKeys::~SshKeys()
 
 void SshKeys::onUnlock(DatabaseWidget *dbWidget)
 {
-    qDebug() << "UNLOCKED";
+    qDebug() << "UNLOCKED" << dbWidget->database()->metadata()->name();
 
     if (Database *db = dbWidget->database()) {
         addKeys(db);
@@ -40,7 +43,14 @@ void SshKeys::onUnlock(DatabaseWidget *dbWidget)
 
 void SshKeys::onLock(DatabaseWidget *dbWidget)
 {
-    qDebug() << "LOCKED";
+    qDebug() << "LOCKED" << dbWidget->database()->metadata()->name();
+
+    removeAllKeys();
+}
+
+void SshKeys::onClose(QString path)
+{
+    qDebug() << "CLOSED:" << path;
 
     removeAllKeys();
 }
@@ -49,21 +59,30 @@ void SshKeys::addKey(Entry *entry, QString hostname, QProcessEnvironment &env)
 {
     auto url = QUrl(entry->url());
     
-    if (url.scheme() == "ssh") { // && QString::compare(hostname, url.host(), Qt::CaseInsensitive) == 0) {
-        qDebug() << "SSH: Adding key:" << url.path();
+    if (url.scheme() != "ssh" || url.path() == "")
+        return;
 
-        QProcess add;
-        add.setProcessEnvironment(env);
-        add.start("ssh-add", QStringList() << url.path());
-        add.waitForStarted();
-        add.write(entry->password().toUtf8());
-        add.write("\n");
-        add.closeWriteChannel();
-        add.waitForFinished();
-
-        // Add to a list of keys so we're not guessing at the removal
-        m_addedKeys << url.path();
+    {
+        auto hostnameNoTLD = hostname.left(hostname.lastIndexOf('.'));
+        auto entryNoTLD = url.host().left(url.host().lastIndexOf('.'));
+        
+        if (QString::compare(hostnameNoTLD, entryNoTLD, Qt::CaseInsensitive) != 0)
+            return;
     }
+    
+    qDebug() << "SSH: Adding key:" << url.path();
+
+    QProcess add;
+    add.setProcessEnvironment(env);
+    add.start("ssh-add", QStringList() << url.path());
+    add.waitForStarted();
+    add.write(entry->password().toUtf8());
+    add.write("\n");
+    add.closeWriteChannel();
+    add.waitForFinished();
+
+    // Add to a list of keys so we're not guessing at the removal
+    m_addedKeys << url.path();
 }
 
 void SshKeys::addKeys(Database *db)
